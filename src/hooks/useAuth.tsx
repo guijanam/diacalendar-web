@@ -10,7 +10,8 @@ interface AuthContextType {
   nickname: string | null
   isLoading: boolean
   signIn: (email: string, password: string) => Promise<{ error: string | null }>
-  signUp: (email: string, password: string, nickname: string) => Promise<{ error: string | null }>
+  signUp: (email: string, password: string) => Promise<{ error: string | null }>
+  setNicknameForUser: (nickname: string) => Promise<{ error: string | null }>
   signOut: () => Promise<void>
   recoverPassword: (email: string) => Promise<{ error: string | null }>
 }
@@ -69,8 +70,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { error: null }
   }
 
-  const signUp = async (email: string, password: string, nickname: string) => {
-    const { data, error } = await supabase.auth.signUp({
+  const signUp = async (email: string, password: string) => {
+    const { error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -87,13 +88,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return { error: error.message }
     }
 
-    if (data.user) {
-      await supabase.from('profiles').upsert({
-        id: data.user.id,
-        nickname,
-      })
-    }
+    return { error: null }
+  }
 
+  const setNicknameForUser = async (newNickname: string) => {
+    if (!user) return { error: '로그인이 필요합니다' }
+
+    const { error } = await supabase.from('profiles').upsert({
+      id: user.id,
+      nickname: newNickname,
+    })
+    if (error) return { error: error.message }
+
+    setNickname(newNickname)
     return { error: null }
   }
 
@@ -109,7 +116,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, session, nickname, isLoading, signIn, signUp, signOut, recoverPassword }}>
+    <AuthContext.Provider value={{ user, session, nickname, isLoading, signIn, signUp, setNicknameForUser, signOut, recoverPassword }}>
       {children}
     </AuthContext.Provider>
   )

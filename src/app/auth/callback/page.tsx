@@ -13,7 +13,20 @@ export default function AuthCallbackPage() {
       const code = params.get('code')
 
       if (code) {
-        await supabase.auth.exchangeCodeForSession(code)
+        const { data: { session } } = await supabase.auth.exchangeCodeForSession(code)
+
+        if (session?.user) {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('nickname')
+            .eq('id', session.user.id)
+            .single()
+
+          if (!profile?.nickname) {
+            router.replace('/auth/nickname')
+            return
+          }
+        }
       }
 
       router.replace('/board')

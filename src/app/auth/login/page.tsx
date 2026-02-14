@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/hooks/useAuth'
+import { supabase } from '@/lib/supabase'
 
 export default function LoginPage() {
   const { signIn } = useAuth()
@@ -23,6 +24,19 @@ export default function LoginPage() {
       setError(error)
       setLoading(false)
     } else {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (session?.user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('nickname')
+          .eq('id', session.user.id)
+          .single()
+
+        if (!profile?.nickname) {
+          router.push('/auth/nickname')
+          return
+        }
+      }
       router.push('/board')
     }
   }

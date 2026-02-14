@@ -10,7 +10,6 @@ export default function SignUpPage() {
   const router = useRouter()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [nickname, setNickname] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
@@ -26,13 +25,7 @@ export default function SignUpPage() {
       return
     }
 
-    if (nickname.trim().length < 2) {
-      setError('닉네임은 2자 이상이어야 합니다')
-      setLoading(false)
-      return
-    }
-
-    const { error } = await signUp(email, password, nickname.trim())
+    const { error } = await signUp(email, password)
     if (error) {
       setError(error)
       setLoading(false)
@@ -102,18 +95,6 @@ export default function SignUpPage() {
               minLength={6}
               className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white text-sm placeholder-gray-400"
               placeholder="6자 이상"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1.5">닉네임</label>
-            <input
-              type="text"
-              value={nickname}
-              onChange={e => setNickname(e.target.value)}
-              required
-              className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white text-sm placeholder-gray-400"
-              placeholder="2자 이상"
             />
           </div>
 
