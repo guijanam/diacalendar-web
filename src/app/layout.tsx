@@ -4,8 +4,8 @@ import { AuthProvider } from "@/hooks/useAuth";
 import Header from "@/components/Header";
 
 export const metadata: Metadata = {
-  title: "DiaCalendar 게시판",
-  description: "철도 근무자 커뮤니티",
+  title: "서교공 커뮤니티",
+  description: "서울교통공사 커뮤니티",
 };
 
 export default function RootLayout({
